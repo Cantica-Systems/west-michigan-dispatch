@@ -1,0 +1,70 @@
+name: scrape
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scrape
+  cancel-in-progress: false
+
+env:
+  # Run JS-based actions (checkout, setup-python) on Node 24 instead of the
+  # default Node 20 (deprecated, forced-switch June 2026, removed Sept 2026).
+  # Drop this once the upstream actions ship a major version that defaults to 24.
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  scrape:
+    name: Fetch + commit upstream snapshots
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Fetch Kent County dispatch
+        run: python scripts/fetch_kent.py
+        continue-on-error: true
+
+      - name: Fetch Grand Rapids City dispatch
+        run: python scripts/fetch_grcity.py
+        continue-on-error: true
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --quiet --cached; then
+            echo "No changes"
+            exit 0
+          fi
+          ts=$(date -u +"%Y-%m-%dT%H:%MZ")
+          git commit -m "Update at $ts"
+          # The concurrency.group above serializes runs, but its lock can
+          # release while the previous run's push is still settling on the
+          # remote. A queued run picking up at that moment commits on top
+          # of stale tip and gets rejected. Pull --rebase before push;
+          # retry on rejection so transient races resolve cleanly.
+          for attempt in 1 2 3; do
+            git pull --rebase --autostash origin main || true
+            if git push origin main; then
+              exit 0
+            fi
+            echo "Push race detected, retrying ($attempt/3)..."
+            sleep 2
+          done
+          echo "Push failed after 3 attempts — surface as job failure."
+          exit 1
