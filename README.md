@@ -35,6 +35,18 @@ it's gone, locked behind a FOIA request. Without a third party preserving these 
 dispatch feed is unrecoverable tomorrow without needless administrative burden. That gap is what this repository
 fills, a permanent, byte-for-byte, verifiable record of what the agencies themselves chose to publish.
 
+## Notes on Kent County's publication
+
+Kent's dispatch feed publishes lat/lon for some kinds of locations and not others. In `data/kent/2026-05.csv` (representative month, ~4,300 rows), the observable pattern was:
+
+- Block-anonymized street addresses (the "X BLOCK OF Y" form representing a ~100-house range, ~81% of rows): lat/lon empty.
+- Highways, intersections, and freeway-ramp rows (~4% of rows): lat/lon populated at ~6-decimal precision.
+- Other rows (trails, named landmarks, businesses, ~15%): lat/lon mostly empty, occasionally populated for well-known features.
+
+We don't know the exact rules Kent applies for which records get coords, and the specific publishing decisions are Kent's. The pattern may change at any time.
+
+This archive relays Kent's output verbatim. No geocoding, no enrichment, no precision adjustment.
+
 ## Layout
 
 ```
