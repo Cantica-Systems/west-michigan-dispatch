@@ -1,0 +1,3 @@
+source,event_time_raw,event_time_utc,event_time_epoch_ms,incident_type,location
+police,05/31/2026 20:04,2026-06-01T00:04:00Z,1780272240000,ASLT,1500 MUSKEGON AVE NW
+police,05/31/2026 20:10,2026-06-01T00:10:00Z,1780272600000,DISO,LAFAYETTE AVE NE / PLAINFIELD AVE NE
