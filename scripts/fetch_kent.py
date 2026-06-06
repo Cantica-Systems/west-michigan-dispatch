@@ -52,8 +52,18 @@ def fetch_pages():
         if "json" not in resp.headers.get("Content-Type", "").lower():
             raise SystemExit("Kent ArcGIS returned non-JSON content type")
         data = resp.json()
-        if "error" in data:
-            raise SystemExit(f"Kent ArcGIS error: {data['error']}")
+        # ArcGIS surfaces errors in two envelope shapes; both must be caught so
+        # an error response isn't mistaken for an empty result and its body isn't
+        # archived as a raw snapshot:
+        #   {"error": {...}}
+        #   {"status": "error", "messages": [...]}
+        err = data.get("error") or (
+            data.get("messages") if data.get("status") == "error" else None
+        )
+        if err is not None:
+            print(f"kent: upstream error envelope, skipping -- {str(err)[:200]}",
+                  file=sys.stderr)
+            break
         features = data.get("features", [])
         pages.append((resp.content, features))
         if not features:
