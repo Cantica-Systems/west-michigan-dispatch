@@ -161,3 +161,8 @@ republish, or build on it.
   All same-block rows therefore share a single coordinate and cannot
   be resolved to specific addresses. This is upstream behavior, not
   imposed by this archive.
+- **Kent's endpoint has recurring overnight outages.** Kent County's
+  ArcGIS endpoint periodically returns errors or stops responding
+  overnight; during those windows no Kent records are captured and the
+  archive has a gap. Collection resumes automatically once the endpoint
+  recovers. The outage is on Kent's side and outside our control.
