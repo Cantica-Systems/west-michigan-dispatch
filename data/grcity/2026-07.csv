@@ -1,0 +1,2 @@
+source,event_time_raw,event_time_utc,event_time_epoch_ms,incident_type,location
+police,06/30/2026 20:06,2026-07-01T00:06:00Z,1782864360000,STOP,FERNANDO ST NE / COLLEGE AVE NE
