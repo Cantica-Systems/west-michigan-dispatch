@@ -27,6 +27,8 @@ QUERY_PARAMS = {
 }
 PAGE_SIZE = int(QUERY_PARAMS["resultRecordCount"])
 PAGINATION_DELAY_S = 2
+# Contact point is the site, not a personal address: this repo is public.
+USER_AGENT = "CanticaBlotter/1.0 (west michigan dispatch archive; cantica.dev)"
 
 ROOT = Path(__file__).resolve().parent.parent
 RAW_DIR = ROOT / "raw" / "kent"
@@ -41,7 +43,14 @@ CSV_COLUMNS = [
 def fetch_pages():
     """Paginate ArcGIS query until exhausted. Returns list of (raw_bytes, parsed_features) per page."""
     session = requests.Session()
-    session.headers["User-Agent"] = None
+    # Identify ourselves. Setting this to None strips the header entirely,
+    # which made every request from this workflow anonymous and shaped like
+    # a scraper, on the one upstream we least want to lose access to. This
+    # job runs every 5 minutes forever, so it is a standing third of the
+    # traffic Kent sees from us; they should be able to tell who it is and
+    # reach us if they want it tuned. The same string already serves the
+    # identical endpoint from the ingest host without issue.
+    session.headers["User-Agent"] = USER_AGENT
     pages = []
     offset = 0
     while True:

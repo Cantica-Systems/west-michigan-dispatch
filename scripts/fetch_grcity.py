@@ -20,6 +20,8 @@ SOURCES = [
     ("fire",   "https://data.grcity.us/Fire_Dispatch/Dispatched_Calls.html"),
 ]
 SOURCE_TZ = ZoneInfo("America/Detroit")
+# Contact point is the site, not a personal address: this repo is public.
+USER_AGENT = "CanticaBlotter/1.0 (west michigan dispatch archive; cantica.dev)"
 
 ROOT = Path(__file__).resolve().parent.parent
 RAW_DIR = ROOT / "raw" / "grcity"
@@ -171,7 +173,10 @@ def merge_csv(new_rows):
 def main():
     now_utc = datetime.now(timezone.utc)
     session = requests.Session()
-    session.headers["User-Agent"] = None
+    # Identify ourselves. Setting this to None strips the header outright,
+    # making every request from this workflow anonymous and scraper-shaped.
+    # See fetch_kent.py for the full reasoning; same policy both feeds.
+    session.headers["User-Agent"] = USER_AGENT
 
     all_rows = []
     raw_count = 0
