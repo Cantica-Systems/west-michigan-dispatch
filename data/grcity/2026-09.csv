@@ -1,0 +1,2 @@
+source,event_time_raw,event_time_utc,event_time_epoch_ms,incident_type,location
+police,08/31/2026 20:05,2026-09-01T00:05:00Z,1788221100000,STOP,S DIVISION AVE / BARTLETT ST SW
